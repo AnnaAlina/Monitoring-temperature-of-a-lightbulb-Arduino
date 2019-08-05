@@ -2,9 +2,7 @@
  
 The purpose of this project is to demonstrate how an Arduino Uno can monitor the temperature from a light bulb source, and turn an ac sourced light bulb on or off depending on the input given. This project utilizes thermistors to sense the temperature and converts the change of resistance into a voltage to be analyzed. 
 
-
-
-    To begin, the the 5v from the arduino uno is utilized as the power source for the MOC3043M. The MOC3043M is a 6-pin zero-cross triac driver output optocoupler. This chip completely isolates the DC voltage from the AC voltage in the circuit. The DC side of the circuit includes the LCD display with a potentiometer, a thermistor voltage divider circuit, 3 LEDs that indicate temperature ranges, and an Arduino Uno. 
+To begin, the the 5v from the arduino uno is utilized as the power source for the MOC3043M. The MOC3043M is a 6-pin zero-cross triac driver output optocoupler. This chip completely isolates the DC voltage from the AC voltage in the circuit. The DC side of the circuit includes the LCD display with a potentiometer, a thermistor voltage divider circuit, 3 LEDs that indicate temperature ranges, and an Arduino Uno. 
 
 While a thermistor’s resistance varies with temperature, that value alone is not useful with the Arduino Uno, when connected in series with another resistor, that resistor value provides a reference point to calculate the varying voltage values at different temperatures. By connecting the center point of the voltage divider to an analog pin on the Uno, it can decipher the voltage reading with its Analog-to-Digital converter. By converting this 10-bit value to a real voltage value. This is accomplished with the following equation:
 
