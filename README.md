@@ -1,2 +1,36 @@
 # Monitoring-temperature-of-a-lightbulb-Arduino
-UART, which stands for Universal Asynchronous Receiver/Transmitter, is a peripheral device on the Tiva LaunchPad. This hardware is basically a two wire system that has one transmitting data while the other receives data. The parallel data has to be converted to serial for the data to be able to be transferred over a cable with the communication standard of RS-232. It is universal due to the adjustability of the transmission speed in which the baud rate can be set to the user’s specification.  In this lab, the UART is utilized to display the temperature on the serial monitor using the program PuTTy. The Digilent Orbit board has an onboard temperature sensor that uses a serial protocol, the I2C bus, to communicate and transfer the data between devices. It uses two wires, the Serial Clock (SCL) and Serial Data (SDA), to connect low speed devices such as the temperature sensor.   Procedure  To begin, the #define directive is used to assign the address of the temperature sensor to 0x4F, as well as setting the API library functions specific to our hardware. The function prototypes are declared for the header to be printed, to read the temperature sensor, and to set the temperature starting value. Because we are utilizing the I2C bus, the correct Port and pins need to be configured, in this case, Port B pins 2 and 3. For transmitting and receiving data, the UART also needs to be enabled. The GPIO pin for the UART receiving line is Port A pin 0 while the transmitting line is GPIO Port A pin 1. The last ports and pins that need to be enabled are the LEDs 1-4 on the Digilent Orbit Board.  The two function prototypes that were declared need to be called and defined. The Set_Temp_Start() function generates a starting temperature value, so it only needs to run once. The Read_temp() function is used to create the comparisons between the read and initial value calculated by the Set_Temp_Start() function. Depending on the difference in temperatures, it will illuminature LED 1, 2, 3, or 4 to signal the number of degrees the temperature either increased or decreased for that cycle.  
+ 
+The purpose of this project is to demonstrate how an Arduino Uno can monitor the temperature from a light bulb source, and turn an ac sourced light bulb on or off depending on the input given. This project utilizes thermistors to sense the temperature and converts the change of resistance into a voltage to be analyzed. 
+
+
+
+    To begin, the the 5v from the arduino uno is utilized as the power source for the MOC3043M. The MOC3043M is a 6-pin zero-cross triac driver output optocoupler. This chip completely isolates the DC voltage from the AC voltage in the circuit. The DC side of the circuit includes the LCD display with a potentiometer, a thermistor voltage divider circuit, 3 LEDs that indicate temperature ranges, and an Arduino Uno. 
+
+While a thermistor’s resistance varies with temperature, that value alone is not useful with the Arduino Uno, when connected in series with another resistor, that resistor value provides a reference point to calculate the varying voltage values at different temperatures. By connecting the center point of the voltage divider to an analog pin on the Uno, it can decipher the voltage reading with its Analog-to-Digital converter. By converting this 10-bit value to a real voltage value. This is accomplished with the following equation:
+
+Where:
+Rs = 4.7k                ADC Value = Vi*1023/Vs
+Rt =  thermistor resistance
+    Vs = 3.3v
+    Vi = measured value
+
+    As one can see, the voltage supplied to the thermistor is 3.3v. This differs from the rest of the DC circuit. The 3.3v pin of the Uno is tied to the AREF pin to create a reference voltage which increases the resolution of the measurement making it more sensitive. Five sample measurements are taken and averaged prior to outputting a true temperature value for even more precise accuracy.  To convert this value to temperature, the simplified B parameter equation was implemented. 
+
+Where:
+     T = Temperature
+To = Room Temp @ 25°C
+      B = Beta of thermistor = 3960
+      R = Resistance Measured
+Ro = Resistance of thermistor @ room temp = 10k
+                1T = 1To+1Bln(RRo)
+                1T=125+13960ln(R10000)
+Once a value has been calculated it can be inverted, and 273.15 will then be subtracted to produce a temperature in celsius. 
+
+Part A utilized this temperature value to have the light remain on within the set parameters, which is to turn the light on continuously if the temperature is below 65 degrees and to turn it off if the temperature ever surpasses 80°C. Part B implements this temperature value in a linear proportional feedback control loop. This applies a corrective force that is linearly proportional to the amount of error. This is found with the formulas:
+
+Where:
+ K = Gain Constant            E = SP - PV
+E = Error                Output = E*K    
+SP = Set Point
+PV = Process Variable
+
